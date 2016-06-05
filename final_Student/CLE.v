@@ -25,6 +25,7 @@ reg [1:0]   state,    next_state;
 reg         sram_wen, n_sram_wen;
 reg         finish,   n_finish;
 
+//sequential part
 always@(posedge clk) begin
     if(reset) begin
         state <= IDLE;
@@ -33,7 +34,7 @@ always@(posedge clk) begin
         state <= next_state;
     end
 end
-
+//combinational part
 always@(*) begin
     case(state)
         finish = 0;
