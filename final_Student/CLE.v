@@ -24,32 +24,33 @@ reg [7:0]   sram_d,   n_sram_d;
 reg [1:0]   state,    next_state;
 reg         sram_wen, n_sram_wen;
 reg         finish,   n_finish;
-
-//sequential part
-always@(posedge clk) begin
-    if(reset) begin
-        state <= IDLE;
-    end
-    else begin
-        state <= next_state;
-    end
-end
+reg         temp[0:1024];
+reg [7:0]   count,n_count;
 //combinational part
 always@(*) begin
+    n_finish = finish;
+    n_count = count;
+    n_sram_wen = sram_wen;
+    n_sram_d = sram_d;
+    n_sram_a = sram_a;
+    n_rom_a = rom_a;
     case(state)
-        finish = 0;
-        n_finish = 0;
-
         IDLE: begin
-            if(reset) begin
+            next_state = READ;
+            n_rom_a = 0;
+        end
+        READ: begin   //iteration 128 times to read
+            if(count < 128)begin
+                for(i=0;i<8;i=i+1)
+                    temp[8*count+i] = rom_q[i];
+                n_count = count +1;
+                n_rom_a = rom_a+1;
                 next_state = READ;
             end
             else begin
-                next_state = state;
+                next_state = PROCESS;
+        
             end
-        end
-
-        READ: begin
         end
         
         PROCCESS: begin
@@ -60,4 +61,25 @@ always@(*) begin
 
 end
 
+//sequential part
+always@(posedge clk or posedge reset) begin
+    if(reset) begin
+        state <= IDLE;
+        rom_a <= 0;
+        sram_a <= 0;
+        sram_d <= 0;
+        sram_wen <= 0 ;
+        finish <= 0;
+        count <= 0
+    end
+    else begin
+        state <= next_state;
+        rom_a <= n_rom_a;
+        sram_a <=n_sram_a;
+        sram_d <=n_sram_d;
+        sram_wem <=n_sram_wen;
+        count <= n_count;
+        finish <= n_finish;
+    end
+end
 endmodule
