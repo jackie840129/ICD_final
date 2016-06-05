@@ -36,7 +36,16 @@ end
 
 always@(*) begin
     case(state)
+        finish = 0;
+        n_finish = 0;
+
         IDLE: begin
+            if(reset) begin
+                next_state = READ;
+            end
+            else begin
+                next_state = state;
+            end
         end
 
         READ: begin
@@ -47,6 +56,7 @@ always@(*) begin
 
         DONE: begin
         end
+
 end
 
 endmodule
