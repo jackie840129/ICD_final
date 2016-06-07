@@ -18,7 +18,7 @@ parameter BFS       =3'd3;
 parameter DONE      =3'd4;
 
 //reg declaration
-reg [9:0]   sum;      n_sum;
+//reg [9:0]   sum;      n_sum;
 reg [6:0]   rom_a,    n_rom_a;
 reg [9:0]   sram_a,   n_sram_a;
 reg [7:0]   sram_d,   n_sram_d;
@@ -105,8 +105,8 @@ always@(*) begin
             else if(count3 >= 9)begin
                 n_head = _head+1;//pop
                 temp[queue[_head]]=0;// original temp ,set that point to 0; 
-                n_count3 = 9;
-                if(_end-_head == 1)begin  //下個時間點 應該end就會等於 head ，也可在下個clk做
+                n_count3 = 0;
+                if(_end-_head == 1)begin  
                     next_state = PROCESS;
                     n_head = 0;
                     n_end = 0;
