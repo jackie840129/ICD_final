@@ -67,8 +67,8 @@ always@(*) begin
         end
         
         PROCESS: begin
-            if(count2 < 1024)begin  //go through temp[0:1024]
-                if(temp[count2] == 1 )begin
+            if(count2 < 1024)begin  //go through temp[0:1023]
+                if(temp[count2] == 1)begin
                     queue[_head] = count2;
                     n_end = _end+1;
                     n_group_num = group_num+1;
@@ -105,7 +105,7 @@ always@(*) begin
             else if(count3 >= 9)begin
                 n_head = _head+1;//pop
                 temp[queue[_head]]=0;// original temp ,set that point to 0; 
-                n_count3 = 0;
+                n_count3 = 9;
                 if(_end-_head == 1)begin  //下個時間點 應該end就會等於 head ，也可在下個clk做
                     next_state = PROCESS;
                     n_head = 0;
@@ -115,7 +115,6 @@ always@(*) begin
         end
 
         DONE: begin
-
         end
 
 end
