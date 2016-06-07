@@ -72,18 +72,26 @@ always@(*) begin
                     queue[_head] = count2;
                     n_end = _end+1;
                     n_group_num = group_num+1;
-                    //temp[count2]=0;
                     next_sate = BFS;
+                    n_count2 = count2+1;
                 end
                 else begin
+                    n_sram_a = count2;
+                    n_sram_d = 0;
                     n_count2 = count2+1;
                 end
             end
+            else begin
+                n_finish = 1;
+                next_state = DONE;
+            end
+
         end
 
         BFS: begin
+            n_sram_a = queue[_head];
+            n_sram_d = group_num;
             //read one of the eight index around temp[count2] each time
-            
             next_state = state;
             if(count3 < 9)begin
                 if(queue[_head]-32+(count3/3)*32-1+(count3%3) && count3!=4)begin
@@ -107,6 +115,7 @@ always@(*) begin
         end
 
         DONE: begin
+
         end
 
 end
