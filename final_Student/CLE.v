@@ -13,7 +13,7 @@ output        finish;
 //parameter declaration
 parameter IDLE      =3'd0;
 parameter READ      =3'd1;
-parameter PROCCESS  =3'd2;
+parameter PROCESS  =3'd2;
 parameter BFS       =3'd3;
 parameter DONE      =3'd4;
 
@@ -25,8 +25,8 @@ reg [7:0]   sram_d,   n_sram_d;
 reg [2:0]   state,    next_state;
 reg         sram_wen, n_sram_wen;
 reg         finish,   n_finish;
-reg         temp[0:1024];
-reg         queue[0:1024];
+reg         temp[0:1023];
+reg         queue[0:1023];
 reg [7:0]   count,n_count;
 reg [9:0]   count2,n_count2; //count index of temp
 reg [3:0]   count3,n_count3; //count from 1 to 9
@@ -66,11 +66,13 @@ always@(*) begin
             end
         end
         
-        PROCCESS: begin
+        PROCESS: begin
             if(count2 < 1024)begin  //go through temp[0:1024]
                 if(temp[count2] == 1 )begin
-                    queue[_head] = temp[count2];
+                    queue[_head] = count2;
+                    n_end = _end+1;
                     n_group_num = group_num+1;
+                    //temp[count2]=0;
                     next_sate = BFS;
                 end
                 else begin
@@ -81,12 +83,25 @@ always@(*) begin
 
         BFS: begin
             //read one of the eight index around temp[count2] each time
+            
+            next_state = state;
             if(count3 < 9)begin
-                if(count2-32+(count3/3)*32-1+(count3%3) && count3!=4)begin
-                    if(temp[count2-32+(count3/3)*32-1+(count3%3)] == 1)begin
-                        queue[_end] = count2-32+(count3/3)*32-1+(count3%3);
+                if(queue[_head]-32+(count3/3)*32-1+(count3%3) && count3!=4)begin
+                    if(temp[queue[_head]-32+(count3/3)*32-1+(count3%3)] == 1)begin
+                        queue[_end] = queue[_head]-32+(count3/3)*32-1+(count3%3);
                         n_end = _end+1;
                     end
+                end
+                n_count3 = count3+1;
+            end
+            else if(count3 >= 9)begin
+                n_head = _head+1;//pop
+                temp[queue[_head]]=0;// original temp ,set that point to 0; 
+                n_count3 = 0;
+                if(_end-_head == 1)begin  //下個時間點 應該end就會等於 head ，也可在下個clk做
+                    next_state = PROCESS;
+                    n_head = 0;
+                    n_end = 0;
                 end
             end
         end
