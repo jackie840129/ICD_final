@@ -28,32 +28,26 @@ reg         finish,   n_finish;
 reg         temp[0:1024];
 reg         queue[0:1024];
 reg [7:0]   count,n_count;
-reg [9:0]   count2,n_count2;
+reg [9:0]   count2,n_count2; //count index of temp
+reg [3:0]   count3,n_count3; //count from 1 to 9
 reg [7:0]   group_num, n_group_num;
 reg [9:0]   _head, n_head, _end, n_end;
-reg         s1, s2, s3, s4, s5, s6, s7, s8;
+//reg         s1, s2, s3, s4, s5, s6, s7, s8;
 
 
 //combinational part
 always@(*) begin
-    s1 = 0;
-    s2 = 0;
-    s3 = 0;
-    s4 = 0;
-    s5 = 0;
-    s6 = 0;
-    s7 = 0;
-    s8 = 0;
     _head = n_head;
     _end = n_end;
     n_finish = finish;
     n_count = count;
     n_count2 = count2;
+    n_count3 = count3;
     n_sram_wen = sram_wen;
     n_sram_d = sram_d;
     n_sram_a = sram_a;
     n_rom_a = rom_a;
-    n_sum = sum;
+    n_group_num = group_num;
     case(state)
         IDLE: begin
             next_state = READ;
@@ -63,7 +57,7 @@ always@(*) begin
             if(count < 128)begin
                 for(i=0;i<8;i=i+1)
                     temp[8*count+i] = rom_q[i];
-                n_count = count +1;
+                n_count = count+1;
                 n_rom_a = rom_a+1;
                 next_state = READ;
             end
@@ -76,26 +70,24 @@ always@(*) begin
             if(count2 < 1024)begin
                 if(temp[count2] == 1 )begin
                     queue[_head] = temp[count2];
-                    n_count2 = count2;
-                    //count how many 1 around temp[count2]
-                    n_sum = temp[count2-33]&1+temp[count2-32]&1+temp[count2-31]&1+
-                        temp[count2-1]&1+temp[count2+1]&1+temp[count2+31]&1+
-                        temp[count2+32]&1+temp[count2+33]&1;
+                    n_group_num = group_num+1;
                     next_sate = BFS;
                 end
                 else begin
-                    n_count2 = count2 +1;
-                    next_state = state;
+                    n_count2 = count2+1;
                 end
             end
         end
 
         BFS: begin
-            //put the index of the pixel that is 1 around temp[count2]
-            for(i=0;i<9;i=i+1)begin
-                if(temp[count2-32+(i/3)*32-1+(i%3)]>=0 && i!=4)
-                    if(temp[count2-32+(i/3)*32-1+(i%3)]==1)
-                        queue[_head+i] = count2-32+(i/3)*32-1+(i%3);
+            //read one of the eight index around temp[count2] each time
+            if(count3 < 9)begin
+                if(count2-32+(count3/3)*32-1+(count3%3) && count3!=4)begin
+                    if(temp[count2-32+(count3/3)*32-1+(count3%3)] == 1)begin
+                        queue[_end] = count2-32+(count3/3)*32-1+(count3%3);
+                        n_end = _end+1;
+                    end
+                end
             end
             n_end = _end + sum;
         end
@@ -116,9 +108,10 @@ always@(posedge clk or posedge reset) begin
         finish <= 0;
         count <= 0;
         count2 <= 0;
+        count3 <= 0;
         _head <= 0;
         _end <= 0;
-        sum <= 0;
+        group_num <= 1;
     end
     else begin
         state <= next_state;
@@ -128,10 +121,11 @@ always@(posedge clk or posedge reset) begin
         sram_wem <=n_sram_wen;
         count <= n_count;
         count2 <= n_count2;
+        count3 <= n_count3;
         finish <= n_finish;
         _head <= n_head;
         _end <= n_end;
-        sum <= n_sum;
+        group_num <= n_group_num;
     end
 end
 endmodule
