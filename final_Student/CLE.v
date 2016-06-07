@@ -67,7 +67,7 @@ always@(*) begin
         end
         
         PROCCESS: begin
-            if(count2 < 1024)begin
+            if(count2 < 1024)begin  //go through temp[0:1024]
                 if(temp[count2] == 1 )begin
                     queue[_head] = temp[count2];
                     n_group_num = group_num+1;
@@ -89,7 +89,6 @@ always@(*) begin
                     end
                 end
             end
-            n_end = _end + sum;
         end
 
         DONE: begin
