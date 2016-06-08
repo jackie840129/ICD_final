@@ -73,7 +73,7 @@ always@(*) begin
                     queue[_head] = count2;
                     n_end = _end+1;
                     n_group_num = group_num+1;
-                    next_sate = BFS;
+                    next_state = BFS;
                     n_count2 = count2+1;
                 end
                 else begin
@@ -117,6 +117,7 @@ always@(*) begin
 
         DONE: begin
         end
+    endcase
 
 end
 
