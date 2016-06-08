@@ -33,7 +33,7 @@ reg [3:0]   count3,n_count3; //count from 1 to 9
 reg [7:0]   group_num, n_group_num;
 reg [9:0]   _head, n_head, _end, n_end;
 //reg         s1, s2, s3, s4, s5, s6, s7, s8;
-
+integer i;
 
 //combinational part
 always@(*) begin
