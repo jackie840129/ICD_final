@@ -95,7 +95,7 @@ always@(*) begin
             //read one of the eight index around temp[count2] each time
             next_state = state;
             if(count3 < 9)begin
-                if(queue[_head]-32+(count3/3)*32-1+(count3%3) && count3!=4)begin
+                if((queue[_head]-32+(count3/3)*32-1+(count3%3))==1 && count3!=4)begin
                     if(temp[queue[_head]-32+(count3/3)*32-1+(count3%3)] == 1)begin
                         queue[_end] = queue[_head]-32+(count3/3)*32-1+(count3%3);
                         n_end = _end+1;
