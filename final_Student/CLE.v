@@ -48,6 +48,7 @@ always@(*) begin
     n_sram_a = sram_a;
     n_rom_a = rom_a;
     n_group_num = group_num;
+    next_state = state;
     case(state)
         IDLE: begin
             next_state = READ;
@@ -140,7 +141,7 @@ always@(posedge clk or posedge reset) begin
         rom_a <= n_rom_a;
         sram_a <=n_sram_a;
         sram_d <=n_sram_d;
-        sram_wem <=n_sram_wen;
+        sram_wen <=n_sram_wen;
         count <= n_count;
         count2 <= n_count2;
         count3 <= n_count3;
